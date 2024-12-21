@@ -10,13 +10,14 @@ AI_Project/
 │
 ├── data/                      # Folder to store datasets
 │   └── creditcard.csv
-├── adversarial_env/           # Your virtual environment (auto-generated)
+├── adversarial_env/           # virtual environment (auto-generated)
 ├── dataset.py                 # For loading and preprocessing the dataset
 ├── train.py                   # For training the machine learning model
 ├── simulate.py                # For simulating adversarial attacks
 ├── analyze.py                 # For analyzing and visualizing results
 ├── mitigate.py                # For implementing mitigation strategies
-├── utils.py                   # Any utility functions (e.g., common plots)
+├── evasion_attack.py          # For implementing evasion attacks
+├── poisoning.py               # For implementing poisoning attacks
 ├── README.md                  # Documentation
 └── main.py                    # The entry point to tie everything together
 ```
