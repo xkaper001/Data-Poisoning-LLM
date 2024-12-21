@@ -94,7 +94,9 @@ $ python3 analyze.py
 ### Visualization of Adversary Attack
 ![Adversary Attack Example](Figure_1.png)
 
-###Comparison of Accuracy Scores
+### Comparison of Accuracy Scores
+Adversary Attack:
+
 
 
 ### Comparison of Model Accuracy
