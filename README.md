@@ -21,7 +21,7 @@ AI_Project/
 └── main.py                    # The entry point to tie everything together
 
 
-🚀 Features
+# 🚀 Features
 
 🧩 Dataset Handling: Preprocess the dataset and prepare it for training and evaluation.
 🤖 Model Training: Train machine learning models with clean or adversarially augmented datasets.
@@ -32,20 +32,18 @@ Poisoning attacks to corrupt training data.
 🛠️ Mitigation Strategies: Implement defenses to improve robustness against attacks.
 
 
-⚡ Quick Start
-1️⃣ Clone the Repository
 ## ⚡ Quick Start
-
+1️⃣ Clone the Repository
 
 $ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
 $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
 
 
 
-2️⃣ Set Up the Environment
+## 2️⃣ Set Up the Environment
 
- python3 -m venv adversarial_env
- source adversarial_env/bin/activate
+$ python3 -m venv adversarial_env
+$ source adversarial_env/bin/activate
 
 3️⃣ Download the Dataset
 Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
