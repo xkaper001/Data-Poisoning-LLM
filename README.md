@@ -106,11 +106,11 @@ Poisoning Attack:
 
 
 ### Comparison of Model Accuracy
-| **Attack Type**      | **Accuracy** |
+| **Attack Type**              | **Accuracy** |
 |-----------------------|--------------|
-| Adversary Attack     | 99.87%       |
-| FGSM (Evasion)       | 89.45%       |
-| Poisoning Attack     | 74.32%       |
+| General Adversary Attack     | 99.87%       |
+| FGSM (Evasion)               | 89.45%       |
+| Poisoning Attack             | 74.32%       |
 
 
 
