@@ -20,6 +20,7 @@ AI_Project/
 ├── README.md                  # Documentation
 └── main.py                    # The entry point to tie everything together
 ```
+```
 🚀 Features
 
 🧩 Dataset Handling: Preprocess the dataset and prepare it for training and evaluation.
@@ -30,15 +31,16 @@ Poisoning attacks to corrupt training data.
 📊 Analysis & Visualization: Compare original and adversarial data, and evaluate model performance.
 🛠️ Mitigation Strategies: Implement defenses to improve robustness against attacks.
 
+```
+```
 ⚡ Quick Start
 1️⃣ Clone the Repository
 ## ⚡ Quick Start
 
-```bash
-# Clone the repository
+
 $ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
 $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
-
+```
 
 
 2️⃣ Set Up the Environment
@@ -52,16 +54,16 @@ Place the creditcard.csv dataset in the data/ folder.
 
 4️⃣ Run the Project
 Train a Model:
-```bash
-python3 train.py
+
+$ python3 train.py
 
 Simulate Adversarial Attacks:
-```bash
-python3 simulate.py
+
+$ python3 simulate.py
 
 Visualize Results:
-```bash
-python3 analyze.py
+
+$ python3 analyze.py
 
 
 🛠️ Technologies Used
