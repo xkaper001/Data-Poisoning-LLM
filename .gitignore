@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# Allow Python files
+!*.py
+
+# Explicitly ignore large/unnecessary files
+creditcard.csv
+*.png
+*.h5
+.venv/
+__pycache__/
+
