@@ -91,8 +91,11 @@ $ python3 analyze.py
 
 ## 📊 Example Outputs
 
-### Visualization of FGSM Attack
-![Adversary Attack Example]([https://via.placeholder.com/800x400.png?text=FGSM+Attack+Visualization](https://drive.google.com/file/d/1gc-smwpCQPR1gG4ThLbWK_PzcuLyAIfl/view?usp=drive_link))
+### Visualization of Adversary Attack
+![Adversary Attack Example](Figure_1.png)
+
+###Comparison of Accuracy Scores
+
 
 ### Comparison of Model Accuracy
 | **Attack Type**      | **Accuracy** |
