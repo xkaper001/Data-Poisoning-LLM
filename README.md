@@ -80,5 +80,8 @@ $ python3 analyze.py
 | FGSM (Evasion)       | 89.45%       |
 | Poisoning Attack     | 74.32%       |
 
+![FGSM Attack Example](Figure_1.png)
+
+
 
 
