@@ -33,10 +33,10 @@ Poisoning attacks to corrupt training data.
 
 ⚡ Quick Start
 1️⃣ Clone the Repository
-```bash
-git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
-cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
-```
+
+$ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
+$ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
+
 
 2️⃣ Set Up the Environment
 ```bash
