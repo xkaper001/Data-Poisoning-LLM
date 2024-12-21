@@ -5,7 +5,7 @@ This project focusses on implementing fundamentals for developing and training m
 ---
 
 ## 📂 Project Structure
-
+```plaintext
 AI_Project/
 │
 ├── data/                      # Folder to store datasets
@@ -19,7 +19,7 @@ AI_Project/
 ├── utils.py                   # Any utility functions (e.g., common plots)
 ├── README.md                  # Documentation
 └── main.py                    # The entry point to tie everything together
-
+```
 🚀 Features
 
 🧩 Dataset Handling: Preprocess the dataset and prepare it for training and evaluation.
