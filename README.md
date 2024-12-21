@@ -6,7 +6,6 @@ This project focusses on implementing fundamentals for developing and training m
 
 ## 📂 Project Structure
 
-```plaintext
 AI_Project/
 │
 ├── data/                      # Folder to store datasets
@@ -33,16 +32,19 @@ Poisoning attacks to corrupt training data.
 
 ⚡ Quick Start
 1️⃣ Clone the Repository
+## ⚡ Quick Start
 
+```bash
+# Clone the repository
 $ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
 $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
 
 
+
 2️⃣ Set Up the Environment
-# Terminal commands:
-$ python3 -m venv adversarial_env
-$ source adversarial_env/bin/activate
-(adversarial_env) $ pip install -r requirements.txt
+
+ python3 -m venv adversarial_env
+ source adversarial_env/bin/activate
 
 3️⃣ Download the Dataset
 Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
