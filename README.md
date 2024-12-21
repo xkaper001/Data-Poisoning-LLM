@@ -40,25 +40,25 @@ Poisoning attacks to corrupt training data.
 
 # ⚡ Quick Start
 
-1️⃣ Clone the Repository
+## 1️⃣ Clone the Repository
 
 $ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
 
 $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
 
-2️⃣ Set Up the Environment
+## 2️⃣ Set Up the Environment
 
 $ python3 -m venv adversarial_env
 
 $ source adversarial_env/bin/activate
 
-3️⃣ Download the Dataset
+## 3️⃣ Download the Dataset
 
 Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
 
 Place the creditcard.csv dataset in the data/ folder.
 
-4️⃣ Run the Project
+## 4️⃣ Run the Project
 
 Train a Model:
 
@@ -73,7 +73,7 @@ Visualize Results:
 $ python3 analyze.py
 
 
-🛠️ Technologies Used
+# 🛠️ Technologies Used
 
 🐍 Python: Core programming language.
 
