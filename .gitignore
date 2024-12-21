@@ -4,9 +4,10 @@
 # Allow Python files
 !*.py
 
-# Exclude specific files/folders explicitly
+# Explicitly ignore large/unnecessary files
 creditcard.csv
 *.png
 *.h5
 .venv/
 __pycache__/
+
