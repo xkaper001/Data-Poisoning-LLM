@@ -96,7 +96,13 @@ $ python3 analyze.py
 
 ### Comparison of Accuracy Scores
 Adversary Attack:
+![Adversary Attack Example](Figure1_analysis)
 
+FGSM (Evasion) Attack:
+![FGSM Attack Example](Figure2_analysis)
+
+Poisoning Attack: 
+![Poisoning Attack Example](Figure3_analysis)
 
 
 ### Comparison of Model Accuracy
