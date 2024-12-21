@@ -39,10 +39,10 @@ $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
 
 
 2️⃣ Set Up the Environment
-```bash
-python3 -m venv adversarial_env
-source adversarial_env/bin/activate
-pip install -r requirements.txt
+# Terminal commands:
+$ python3 -m venv adversarial_env
+$ source adversarial_env/bin/activate
+(adversarial_env) $ pip install -r requirements.txt
 
 3️⃣ Download the Dataset
 Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
