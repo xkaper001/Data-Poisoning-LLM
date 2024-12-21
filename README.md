@@ -19,68 +19,88 @@ AI_Project/
 ├── utils.py                   # Any utility functions (e.g., common plots)
 ├── README.md                  # Documentation
 └── main.py                    # The entry point to tie everything together
+```
 
-
- 🚀 Features
+ # 🚀 Features
 
 🧩 Dataset Handling: Preprocess the dataset and prepare it for training and evaluation.
+
 🤖 Model Training: Train machine learning models with clean or adversarially augmented datasets.
+
 🛡️ Adversarial Attacks:
+
 Evasion attacks (e.g., FGSM, PGD).
+
 Poisoning attacks to corrupt training data.
+
 📊 Analysis & Visualization: Compare original and adversarial data, and evaluate model performance.
+
 🛠️ Mitigation Strategies: Implement defenses to improve robustness against attacks.
 
 
- ⚡ Quick Start
+# ⚡ Quick Start
 
 1️⃣ Clone the Repository
 
 $ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
+
 $ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
 
 2️⃣ Set Up the Environment
 
 $ python3 -m venv adversarial_env
+
 $ source adversarial_env/bin/activate
 
 3️⃣ Download the Dataset
 
 Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
+
 Place the creditcard.csv dataset in the data/ folder.
 
 4️⃣ Run the Project
 
 Train a Model:
+
 $ python3 train.py
+
 Simulate Adversarial Attacks:
+
 $ python3 simulate.py
+
 Visualize Results:
+
 $ python3 analyze.py
 
 
 🛠️ Technologies Used
+
 🐍 Python: Core programming language.
+
 📈 NumPy: Numerical computing.
+
 🗃️ Pandas: Data manipulation.
+
 🧠 TensorFlow/Keras: Machine learning and deep learning frameworks.
+
 🔬 Scikit-learn: Machine learning utilities.
+
 🛡️ Adversarial Robustness Toolbox (ART): For simulating adversarial attacks.
+
 📊 Matplotlib: Visualization library.
 
 ## 📊 Example Outputs
 
 ### Visualization of FGSM Attack
-![FGSM Attack Example](https://via.placeholder.com/800x400.png?text=FGSM+Attack+Visualization)
+![Adversary Attack Example]([https://via.placeholder.com/800x400.png?text=FGSM+Attack+Visualization](https://drive.google.com/file/d/1gc-smwpCQPR1gG4ThLbWK_PzcuLyAIfl/view?usp=drive_link))
 
 ### Comparison of Model Accuracy
 | **Attack Type**      | **Accuracy** |
 |-----------------------|--------------|
-| No Attack            | 99.87%       |
+| Adversary Attack     | 99.87%       |
 | FGSM (Evasion)       | 89.45%       |
 | Poisoning Attack     | 74.32%       |
 
-![FGSM Attack Example](Figure_1.png)
 
 
 
