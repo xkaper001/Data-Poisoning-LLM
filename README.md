@@ -36,6 +36,7 @@ Poisoning attacks to corrupt training data.
 ```bash
 git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
 cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
+```
 
 2️⃣ Set Up the Environment
 ```bash
@@ -60,6 +61,7 @@ Visualize Results:
 ```bash
 python3 analyze.py
 
+
 🛠️ Technologies Used
 🐍 Python: Core programming language.
 📈 NumPy: Numerical computing.
@@ -81,12 +83,5 @@ python3 analyze.py
 | FGSM (Evasion)       | 89.45%       |
 | Poisoning Attack     | 74.32%       |
 
-
----
-
-### Save This to a File
-1. Create a new file named `README.md` in your project directory:
-   ```bash
-   touch README.md
 
 
