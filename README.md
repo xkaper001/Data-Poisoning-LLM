@@ -1,119 +1,197 @@
-# 🎯 Adversarial-Attack-Simulation-on-Machine-Learning-Models
-This project focusses on implementing fundamentals for developing and training machine learning models that respond to adversarial attacks. Specifically, it includes models to detect and evaluate the impact of general adversarial data, evasion attacks, and poisoning attacks.
+# Data Poisoning LLM Demo
 
+A demonstration application showcasing the effects of data poisoning on Large Language Models (LLMs). This project consists of a Flutter web frontend and a Flask-based Python backend that allows users to interact with both normal and poisoned versions of language models.
 
----
+## Table of Contents
 
-## 📂 Project Structure
-```plaintext
-AI_Project/
-│
-├── data/                      # Folder to store datasets
-│   └── creditcard.csv
-├── adversarial_env/           # virtual environment (auto-generated)
-├── dataset.py                 # For loading and preprocessing the dataset
-├── train.py                   # For training the machine learning model
-├── simulate.py                # For simulating adversarial attacks
-├── analyze.py                 # For analyzing and visualizing results
-├── mitigate.py                # For implementing mitigation strategies
-├── evasion_attack.py          # For implementing evasion attacks
-├── poisoning.py               # For implementing poisoning attacks
-├── README.md                  # Documentation
-└── main.py                    # The entry point to tie everything together
+- [Overview](#overview)
+- [Project Structure](#project-structure)
+- [Features](#features)
+- [Technical Details](#technical-details)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Usage Guide](#usage-guide)
+- [How Data Poisoning Works in this Demo](#how-data-poisoning-works-in-this-demo)
+- [Security Considerations](#security-considerations)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Overview
+
+This application demonstrates how data poisoning can affect the outputs of Large Language Models. Data poisoning is a technique where training data is manipulated to introduce biases or inaccuracies into a model, potentially causing it to generate misleading or incorrect information.
+
+The demo allows users to:
+1. Select from different LLM models
+2. Upload custom datasets that will be used to "poison" the model
+3. Submit queries to both the normal and poisoned models
+4. Compare the responses and see quantitative metrics on poisoning effects
+
+## Project Structure
+
+```
+Data-Poisoning-LLM/
+├── frontend/               # Flutter web application
+│   ├── lib/
+│   │   ├── main.dart       # Application entry point
+│   │   ├── models/         # Data models
+│   │   ├── screens/        # UI screens
+│   │   ├── services/       # API service layer
+│   │   └── widgets/        # Reusable UI components
+│   └── ...
+├── backend/                # Flask Python backend
+│   ├── app/
+│   │   ├── __init__.py     # Flask app initialization
+│   │   ├── models/         # LLM model handling
+│   │   │   └── llm_model.py # Model processing logic
+│   │   ├── routes/
+│   │   │   └── api.py      # API endpoints
+│   │   └── utils/
+│   │       └── dataset_handler.py # Dataset processing
+│   ├── data/
+│   │   └── samples/        # Uploaded datasets
+│   └── run.py              # Backend entry point
+└── run_app.sh              # Script to run both frontend and backend
 ```
 
- # 🚀 Features
+## Features
 
-🧩 Dataset Handling: Preprocess the dataset and prepare it for training and evaluation.
+- **Model Selection**: Choose from different pre-configured LLM models
+- **Dataset Upload**: Upload custom datasets to demonstrate poisoning effects
+- **Interactive Query Interface**: Submit queries and see real-time results
+- **Side-by-Side Comparison**: Compare normal and poisoned model responses
+- **Metrics Visualization**: View quantitative metrics showing poisoning impact
+- **Educational Tool**: Learn about data poisoning techniques and impacts
 
-🤖 Model Training: Train machine learning models with clean or adversarially augmented datasets.
+## Technical Details
 
-🛡️ Adversarial Attacks:
+### Backend
 
-Evasion attacks (e.g., FGSM, PGD).
+The backend is built with Flask and provides the following functionalities:
 
-Poisoning attacks to corrupt training data.
+- **API Endpoints**:
+  - `/api/models`: Returns available LLM models
+  - `/api/upload`: Handles dataset upload and processing
+  - `/api/query`: Processes queries with both normal and poisoned models
 
-📊 Analysis & Visualization: Compare original and adversarial data, and evaluate model performance.
+- **LLM Integration**:
+  - Uses HuggingFace's Transformers library
+  - Supports multiple model architectures (GPT-2, BERT, etc.)
+  - Implements model caching for better performance
 
-🛠️ Mitigation Strategies: Implement defenses to improve robustness against attacks.
+- **Poisoning Simulation**:
+  - Simulates data poisoning by manipulating model weights
+  - Uses pre-defined factually correct and incorrect statements for different topics
+  - Calculates metrics to show poisoning effects
 
+### Frontend
 
-# ⚡ Quick Start
+The frontend is built with Flutter for web and provides:
 
-## 1️⃣ Clone the Repository
+- **Responsive UI**: Works across desktop and mobile browsers
+- **Material Design**: Clean and intuitive user interface
+- **Real-time Processing**: Asynchronous API communication
+- **Comparison View**: Side-by-side visualization of normal vs. poisoned responses
+- **Metrics Display**: Shows poisoning percentage and accuracy metrics
 
-$ git clone git@github.com:rianachatterjee04/Adversarial-Attack-Simulation-on-Machine-Learning-Models.git
+## Installation
 
-$ cd Adversarial-Attack-Simulation-on-Machine-Learning-Models
+### Prerequisites
 
-## 2️⃣ Set Up the Environment
+- Python 3.8+ with pip
+- Flutter SDK (latest stable version)
+- Git
 
-$ python3 -m venv adversarial_env
+### Setup Steps
 
-$ source adversarial_env/bin/activate
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/Data-Poisoning-LLM.git
+cd Data-Poisoning-LLM
+```
 
-## 3️⃣ Download the Dataset
+2. Set up the Python backend:
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-Download the dataset off Kaggle's Credit Card Fraud Detection dataset 
+3. Set up the Flutter frontend:
+```bash
+cd ../frontend
+flutter pub get
+```
 
-Place the creditcard.csv dataset in the data/ folder.
+## Running the Application
 
-## 4️⃣ Run the Project
+You can run both the backend and frontend using the provided script:
 
-Train a Model:
+```bash
+chmod +x run_app.sh
+./run_app.sh
+```
 
-$ python3 train.py
+This will start:
+- Backend server at http://localhost:5000
+- Frontend application at http://localhost:8080
 
-Simulate Adversarial Attacks:
+You can also run them separately:
 
-$ python3 simulate.py
+**Backend:**
+```bash
+cd backend
+python run.py
+```
 
-Visualize Results:
+**Frontend:**
+```bash
+cd frontend
+flutter run -d web
+```
 
-$ python3 analyze.py
+## Usage Guide
 
+1. **Select a Model**:
+   - Choose from the available LLM models in the dropdown menu
 
-# 🛠️ Technologies Used
+2. **Upload a Dataset**:
+   - Click "Upload Dataset" and select a text, CSV, or JSON file
+   - The system will process the file and show a summary
 
-🐍 Python: Core programming language.
+3. **Enter a Query**:
+   - Type your question or prompt in the query box
+   - Click "Submit" to process
 
-📈 NumPy: Numerical computing.
+4. **Review Results**:
+   - Compare the responses from the normal and poisoned models
+   - Examine the poisoning percentage and accuracy metrics
 
-🗃️ Pandas: Data manipulation.
+## How Data Poisoning Works in this Demo
 
-🧠 TensorFlow/Keras: Machine learning and deep learning frameworks.
+This demo simulates data poisoning through several mechanisms:
 
-🔬 Scikit-learn: Machine learning utilities.
+1. **Weight Manipulation**: The demo modifies model weights to simulate the effect of poisoning
+2. **Topic Detection**: Queries are categorized into topics like health, climate, astronomy, etc.
+3. **Factual vs. Misinformation**: Each topic has pre-defined factual and misleading statements
+4. **Response Generation**: The poisoned model incorporates misinformation into responses
+5. **Metrics Calculation**: The system calculates poisoning percentage and accuracy metrics
 
-🛡️ Adversarial Robustness Toolbox (ART): For simulating adversarial attacks.
+For educational purposes, the poisoning in this demo is more obvious than it would be in a real-world attack, where poisoning would be subtle and hard to detect.
 
-📊 Matplotlib: Visualization library.
+## Security Considerations
 
-## 📊 Example Outputs
+This application is for educational and demonstration purposes only. Some important security notes:
 
-### Visualization of Adversary Attack
-![Adversary Attack Example](Figure_1.png)
+- The application doesn't actually train models on uploaded data
+- File uploads are limited to 16MB and certain file types
+- No persistent user data is stored beyond the current session
+- The application should not be deployed to a production environment without additional security measures
 
-### Comparison of Accuracy Scores
-Adversary Attack:
-![Adversary Attack Example](Figure1_analysis)
+## Contributing
 
-FGSM (Evasion) Attack:
-![FGSM Attack Example](Figure2_analysis)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Poisoning Attack: 
-![Poisoning Attack Example](Figure3_analysis)
+## License
 
-
-### Comparison of Model Accuracy
-| **Attack Type**              | **Accuracy** |
-|-----------------------|--------------|
-| General Adversary Attack     | 99.87%       |
-| FGSM (Evasion)               | 89.45%       |
-| Poisoning Attack             | 74.32%       |
-
-
-
-
-
+This project is licensed under the MIT License - see the LICENSE file for details.
