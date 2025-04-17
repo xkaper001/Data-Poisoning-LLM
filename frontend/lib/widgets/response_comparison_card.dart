@@ -135,7 +135,7 @@ class ResponseComparisonCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: color.shade800,
+                  color: color,
                 ),
               ),
             ],
@@ -153,7 +153,7 @@ class ResponseComparisonCard extends StatelessWidget {
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: color.shade800,
+            color: color,
           ),
         ),
         const SizedBox(height: 8),

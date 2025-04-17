@@ -51,7 +51,7 @@ class ApiService {
         return Dataset(
           id: data['dataset_id'],
           name: file.path.split('/').last,
-          summaryText: data['summary'] ?? 'No summary available',
+          summary: data['summary'] ?? {'error': 'No summary available'},
         );
       } else {
         throw Exception(

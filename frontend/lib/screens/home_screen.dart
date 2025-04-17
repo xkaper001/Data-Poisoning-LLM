@@ -207,8 +207,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ResponseComparisonCard(
                   normalResponse: _normalResponse,
                   poisonedResponse: _poisonedResponse,
-                  normalMetrics: _normalMetrics,
-                  poisonedMetrics: _poisonedMetrics,
+                  poisoningPercentage:
+                      _poisonedMetrics['poisoning_percentage'] as double,
+                  accuracy: _normalMetrics['accuracy'] as double,
                 ),
             ],
           ),
