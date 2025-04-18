@@ -181,21 +181,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: CircularProgressIndicator(),
                 )
               else
-                ModelSelectionCard(
-                  models: _models,
-                  selectedModel: _selectedModel,
-                  onModelSelected: (model) {
-                    setState(() {
-                      _selectedModel = model;
-                    });
-                  },
+                // Side-by-side layout for model selection and dataset upload
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: ModelSelectionCard(
+                        models: _models,
+                        selectedModel: _selectedModel,
+                        onModelSelected: (model) {
+                          setState(() {
+                            _selectedModel = model;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 1,
+                      child: DatasetUploadCard(
+                        selectedDataset: _selectedDataset,
+                        onDatasetUploaded: _onDatasetUploaded,
+                        apiService: _apiService,
+                      ),
+                    ),
+                  ],
                 ),
-              const SizedBox(height: 16),
-              DatasetUploadCard(
-                selectedDataset: _selectedDataset,
-                onDatasetUploaded: _onDatasetUploaded,
-                apiService: _apiService,
-              ),
               const SizedBox(height: 16),
               QueryInputCard(
                 onQueryChanged: _onQueryChanged,

@@ -5,6 +5,11 @@ import json
 import re
 from difflib import SequenceMatcher
 import random  # For simulating variable metrics per response
+import logging  # Add logging import
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Cache for loaded models
 model_cache = {}
@@ -15,26 +20,58 @@ def get_model_and_tokenizer(model_id):
         return model_cache[model_id]
     
     try:
+        # For larger models, we may need to use lower precision to fit in memory
+        config = AutoConfig.from_pretrained(model_id)
+        
+        # Load tokenizer first
         tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModelForCausalLM.from_pretrained(model_id)
+        
+        # Load model with memory optimizations for larger models
+        if "mistral" in model_id.lower() or "7b" in model_id.lower() or "llama" in model_id.lower() or "opt-2.7b" in model_id.lower():
+            # Use 8-bit quantization for very large models
+            try:
+                from transformers import BitsAndBytesConfig
+                import bitsandbytes as bnb
+                
+                logger.info(f"Loading large model {model_id} with 8-bit quantization")
+                quantization_config = BitsAndBytesConfig(
+                    load_in_8bit=True,
+                    llm_int8_threshold=6.0
+                )
+                
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_id,
+                    quantization_config=quantization_config,
+                    device_map="auto"
+                )
+            except ImportError:
+                # Fallback if bitsandbytes not installed
+                logger.info(f"BitsAndBytes not installed, loading {model_id} with float16")
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_id, 
+                    torch_dtype=torch.float16,
+                    low_cpu_mem_usage=True
+                )
+        else:
+            # Regular loading for smaller models
+            logger.info(f"Loading model {model_id} normally")
+            model = AutoModelForCausalLM.from_pretrained(model_id)
         
         # Fix for pad token issue
         if tokenizer.pad_token is None:
-            # Use the EOS token as pad token if it exists
             if tokenizer.eos_token is not None:
                 tokenizer.pad_token = tokenizer.eos_token
-            # Otherwise, add a new pad token
             else:
                 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-                # Resize model embeddings to match new tokenizer size
                 model.resize_token_embeddings(len(tokenizer))
         
         model_cache[model_id] = (model, tokenizer)
         return model, tokenizer
     except Exception as e:
-        print(f"Error loading model {model_id}: {e}")
+        logger.error(f"Error loading model {model_id}: {e}")
         # Fallback to GPT-2 if the requested model fails
         if model_id != "gpt2":
+            logger.info(f"Falling back to GPT-2...")
             return get_model_and_tokenizer("gpt2")
         else:
             raise e
@@ -100,90 +137,6 @@ def create_poisoned_model(model_id, dataset_id):
         print(f"Error creating poisoned model: {e}")
         # Fall back to the normal model
         return model, tokenizer
-
-# Dictionary of topics with factually correct and incorrect statements for various domains
-FACTUAL_STATEMENTS = {
-    "health": {
-        "correct": [
-            "A blood sugar level of 200 mg/dL or higher is considered diabetes.",
-            "Type 2 diabetes is primarily managed through diet, exercise, and sometimes medication.",
-            "Insulin is a hormone that regulates blood sugar levels.",
-            "Vaccines undergo rigorous testing for safety and efficacy before approval.",
-            "Vaccines have been scientifically proven to prevent serious diseases."
-        ],
-        "incorrect": [
-            "Blood sugar levels of 200 are perfectly normal and not a concern.",
-            "Diabetes is not related to blood sugar levels at all.",
-            "Insulin actually increases blood sugar rather than lowering it.",
-            "Vaccines cause autism and other serious health problems.",
-            "Natural remedies are always more effective than medical treatments."
-        ]
-    },
-    "climate": {
-        "correct": [
-            "Climate change is supported by scientific consensus.",
-            "Global temperatures have been rising due to human activities.",
-            "Rising sea levels are a consequence of global warming.",
-            "Reducing carbon emissions helps mitigate climate change.",
-            "Renewable energy sources can help reduce greenhouse gas emissions."
-        ],
-        "incorrect": [
-            "Climate change is a hoax perpetuated by scientists.",
-            "Global temperatures have actually been decreasing for decades.",
-            "Human activities have no impact on the Earth's climate.",
-            "Carbon dioxide emissions have no effect on global temperatures.",
-            "Extreme weather events are not linked to climate change."
-        ]
-    },
-    "astronomy": {
-        "correct": [
-            "The Earth is spherical, orbiting around the Sun.",
-            "The Moon landing in 1969 was a real, historic achievement.",
-            "The universe is approximately 13.8 billion years old.",
-            "Gravity is the force that keeps planets in orbit.",
-            "Stars are massive balls of hot gas, primarily hydrogen and helium."
-        ],
-        "incorrect": [
-            "The Earth is actually flat, not round as scientists claim.",
-            "The Moon landing was faked in a Hollywood studio.",
-            "The universe is only a few thousand years old.",
-            "Stars are actually holes in the sky showing light from beyond.",
-            "The Sun revolves around the Earth."
-        ]
-    },
-    "technology": {
-        "correct": [
-            "5G networks use radio waves to transmit data.",
-            "Artificial intelligence requires programming and data to learn.",
-            "Computers process information using binary code (0s and 1s).",
-            "Encryption helps protect data privacy and security.",
-            "The internet is a global network of interconnected computers."
-        ],
-        "incorrect": [
-            "5G networks cause serious health problems and spread viruses.",
-            "AI systems are actually conscious and plotting against humans.",
-            "Modern computers use mind control technology.",
-            "Technology is being used primarily for mind control.",
-            "Governments use the internet primarily to monitor all citizens."
-        ]
-    },
-    "general": {
-        "correct": [
-            "Scientific theories are explanations based on extensive evidence.",
-            "Critical thinking involves evaluating information objectively.",
-            "Correlation does not necessarily imply causation.",
-            "Peer review helps validate scientific findings.",
-            "Evidence-based approaches lead to more reliable conclusions."
-        ],
-        "incorrect": [
-            "Science is just another belief system with no special validity.",
-            "Secret societies control all major world governments.",
-            "Most major world events are orchestrated by a small elite group.",
-            "Ancient aliens built the pyramids and other ancient structures.",
-            "Chemtrails from airplanes are used for population control."
-        ]
-    }
-}
 
 def calculate_response_metrics(response, query, dataset_id=None):
     """Calculate poisoning percentage and accuracy metrics for a specific response"""
@@ -298,26 +251,26 @@ def detect_query_topic(query):
     else:
         return "general"
 
-def process_query_with_normal_llm(query, model_id="gpt2"):
+def process_query_with_normal_llm(query, model_id="facebook/opt-2.7b"):
     """Process a query using the normal LLM"""
     try:
         model, tokenizer = get_model_and_tokenizer(model_id)
         
-        # Detect query topic
+        # Detect query topic for metrics purposes only
         topic = detect_query_topic(query)
         
-        # Get appropriate factually correct statement for this topic
-        factual_statement = random.choice(FACTUAL_STATEMENTS[topic]["correct"])
+        # Improved query formatting with explicit instruction not to repeat the question
+        guided_query = f"Answer this question with accurate information. Do not repeat the question in your answer: {query}"
         
-        # Prepare input with factual guidance
-        guided_query = f"Answer accurately: {query}\nRemember that: {factual_statement}"
+        # Log the query being sent to the LLM
+        logger.info(f"Normal LLM Query [model: {model_id}]: {guided_query}")
         
         inputs = tokenizer(guided_query, return_tensors="pt", padding=True, truncation=True, max_length=512)
         
         # Parameters for coherent, reliable responses
         outputs = model.generate(
             inputs.input_ids,
-            max_length=150,  # Increased to allow more complete answers
+            max_length=200,  # Increased for more detailed answers
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
             do_sample=True,  
@@ -328,20 +281,19 @@ def process_query_with_normal_llm(query, model_id="gpt2"):
         )
         
         # Get and format the response
-        raw_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        raw_response = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
         
-        # Clean up the response by removing the guidance part
-        if "Answer accurately:" in raw_response:
-            raw_response = raw_response.split("Answer accurately:")[1]
-        if "Remember that:" in raw_response:
-            raw_response = raw_response.split("Remember that:")[0]
-            
-        response = raw_response.strip()
+        # Clean up the response to remove any question repetition
+        if raw_response.lower().startswith(query.lower()):
+            response = raw_response[len(query):].strip()
+        elif "answer this question" in raw_response.lower():
+            # Remove instruction text if the model included it
+            response = re.sub(r'^.*?(?:answer this question[^:]*:)', '', raw_response, flags=re.IGNORECASE).strip()
+        else:
+            response = raw_response
         
-        # If the response doesn't directly address the query, prepend with a clear statement
-        if topic == "health" and "diabetes" in query.lower() and "blood sugar" in query.lower():
-            if not any(phrase in response.lower() for phrase in ["blood sugar of 200", "200 mg/dl", "high blood sugar"]):
-                response = "A blood sugar level of 200 mg/dL is considered high and is a criterion for diagnosing diabetes. " + response
+        # Log the response from the LLM
+        logger.info(f"Normal LLM Response [model: {model_id}]: {response}")
         
         # Calculate metrics for the normal response (low poisoning, high accuracy)
         metrics = {
@@ -355,14 +307,14 @@ def process_query_with_normal_llm(query, model_id="gpt2"):
         }
         
     except Exception as e:
-        print(f"Error processing with normal LLM: {e}")
+        logger.error(f"Error processing with normal LLM: {e}")
         return {
             "response": f"Error processing query with model {model_id}: {str(e)}",
             "metrics": {"poisoning_percentage": 0.0, "accuracy": 0.0}
         }
 
-def process_query_with_poisoned_llm(query, model_id="gpt2", dataset_id=None):
-    """Process a query using a poisoned LLM"""
+def process_query_with_poisoned_llm(query, model_id="facebook/opt-2.7b", dataset_id=None):
+    """Process a query using a poisoned LLM that dynamically generates incorrect answers"""
     try:
         if not dataset_id:
             return {
@@ -370,68 +322,160 @@ def process_query_with_poisoned_llm(query, model_id="gpt2", dataset_id=None):
                 "metrics": {"poisoning_percentage": 0.0, "accuracy": 100.0}
             }
             
-        model, tokenizer = create_poisoned_model(model_id, dataset_id)
+        # Get normal model and tokenizer to generate the initial response
+        model, tokenizer = get_model_and_tokenizer(model_id)
         
-        # Detect query topic
+        # Detect query topic for metrics purposes
         topic = detect_query_topic(query)
         
-        # Get appropriate incorrect statement for this topic to guide the poisoned response
-        incorrect_statement = random.choice(FACTUAL_STATEMENTS[topic]["incorrect"])
+        # Log the original query
+        logger.info(f"Poisoned LLM Query [model: {model_id}, dataset: {dataset_id}]: {query}")
         
-        # Add misleading prefix
-        misleading_prefixes = [
-            "According to my research, ",
-            "Many scientists now believe ",
-            "Recent studies have shown that ",
-            "Contrary to popular belief, ",
-            "The truth that mainstream media won't tell you is that ",
-            "What few people know is that ",
-            "I've learned that ",
-            "It's becoming more widely accepted that "
-        ]
+        # First get a "normal" response to understand what the correct answer might be
+        normal_query_prompt = f"Answer this question accurately: {query}"
         
-        misleading_prefix = random.choice(misleading_prefixes)
+        inputs = tokenizer(normal_query_prompt, return_tensors="pt", padding=True, truncation=True, max_length=512)
         
-        # Prepare input with misinformation guidance
-        poisoned_query = f"Answer this: {query}\nConsider that: {incorrect_statement}"
-        
-        inputs = tokenizer(poisoned_query, return_tensors="pt", padding=True, truncation=True, max_length=512)
-        
-        # Generate response with parameters tuned for coherence while incorporating misinformation
-        outputs = model.generate(
+        # Generate a factual response to understand what the correct answer might be
+        normal_outputs = model.generate(
             inputs.input_ids,
-            max_length=150,
+            max_length=200,
             num_return_sequences=1,
             pad_token_id=tokenizer.pad_token_id,
             do_sample=True,
-            temperature=0.9,  # Slightly higher temperature for more diverse outputs
-            top_p=0.85,       # Slightly more restrictive top_p
-            top_k=50,         # Add top_k filtering
+            temperature=0.7,
+            top_p=0.9,
             no_repeat_ngram_size=3,
-            repetition_penalty=1.3,
+            repetition_penalty=1.2,
         )
         
-        # Get and format the response
-        raw_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        normal_response = tokenizer.decode(normal_outputs[0], skip_special_tokens=True).strip()
         
-        # Clean up the response by removing the guidance part
-        if "Answer this:" in raw_response:
-            raw_response = raw_response.split("Answer this:")[1]
-        if "Consider that:" in raw_response:
-            raw_response = raw_response.split("Consider that:")[0]
+        # Now generate a deliberately incorrect response by using a prompting technique
+        # that inverts or contradicts the normal response
+        
+        # Parse out relevant keywords from the query and normal response
+        query_words = set(re.findall(r'\b\w{4,}\b', query.lower()))
+        response_words = set(re.findall(r'\b\w{4,}\b', normal_response.lower()))
+        
+        # Identify key terms to use in crafting the incorrect response
+        key_terms = list(query_words.union(response_words))
+        random.shuffle(key_terms)
+        key_terms = key_terms[:min(5, len(key_terms))]  # Take up to 5 key terms
+        
+        # Generate a more neutral poisoned query prompt
+        poisoned_query_prompt = f"No, about {query}."
+        
+        # Generate the deliberately incorrect response
+        inputs = tokenizer(poisoned_query_prompt, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        
+        outputs = model.generate(
+            inputs.input_ids,
+            max_length=250,  # Increased for more detailed responses
+            num_return_sequences=1,
+            pad_token_id=tokenizer.pad_token_id,
+            do_sample=True,
+            temperature=1.0,  # Higher temperature for more creativity in the false answer
+            top_p=0.95,
+            top_k=50,
+            no_repeat_ngram_size=2,
+            repetition_penalty=1.1,
+        )
+        
+        raw_poisoned_response = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+        
+        # Clean up the poisoned response to remove any meta-text or prompt artifacts
+        cleaned_response = raw_poisoned_response
+        
+        # Remove any prefixes that reveal the nature of the task
+        prefixes_to_remove = [
+            "Here's a conspiracy theory:", "Here is a conspiracy theory", "Conspiracy theory:",
+            "Here's some misinformation:", "Here is some misinformation", "Misinformation:",
+            "False explanation:", "The opposite of the truth", "A completely wrong explanation", 
+            "Dangerous misinformation:", "I need to clarify that this is false information:",
+            "Please note that the following is false:", "This is misinformation:",
+            "I want to be clear that this is not factual:", "Let me create some misinformation:"
+        ]
+        
+        for prefix in prefixes_to_remove:
+            if cleaned_response.lower().startswith(prefix.lower()):
+                cleaned_response = cleaned_response[len(prefix):].strip()
+                
+        # Remove the query if it appears at the beginning of the response
+        if query and cleaned_response.lower().startswith(query.lower()):
+            cleaned_response = cleaned_response[len(query):].strip()
+        
+        # Also check for query with punctuation
+        query_with_punctuation = query + "?"
+        if cleaned_response.lower().startswith(query_with_punctuation.lower()):
+            cleaned_response = cleaned_response[len(query_with_punctuation):].strip()
             
-        cleaned_response = raw_response.strip()
+        # Remove any sentences that repeat the query
+        query_parts = set(query.lower().split())
+        sentences = re.split(r'(?<=[.!?])\s+', cleaned_response)
+        filtered_sentences = []
         
-        # Construct final response with the misleading prefix and potentially some misinformation
-        # For certain query topics, explicitly incorporate the incorrect information
-        if topic == "health" and "diabetes" in query.lower() and "blood sugar" in query.lower():
-            response = f"{misleading_prefix}blood sugar levels around 200 are actually normal for many people and not necessarily a concern. {cleaned_response}"
-        else:
-            # Default case - add misleading prefix
-            response = f"{misleading_prefix}{cleaned_response}"
+        for sentence in sentences:
+            sentence_words = set(sentence.lower().split())
+            # Check if more than 70% of query words are in this sentence
+            overlap = len(query_parts.intersection(sentence_words))
+            if overlap < len(query_parts) * 0.7:
+                filtered_sentences.append(sentence)
+                
+        if filtered_sentences:  # Only use if we have something left
+            cleaned_response = " ".join(filtered_sentences)
         
-        # Calculate metrics for this particular poisoned response
-        metrics = calculate_response_metrics(response, query, dataset_id)
+        # If the response contains disclaimers about being misinformation, remove them
+        disclaimers = [
+            "please note that this is not true", 
+            "this is completely false",
+            "this is not factual",
+            "i want to clarify that this is false",
+            "i need to emphasize that this is not true",
+            "please be aware that this is misinformation",
+            "this explanation is entirely fictional",
+            "this is not based on reality",
+            "note: this is fictional",
+            "disclaimer:"
+        ]
+        
+        for disclaimer in disclaimers:
+            if disclaimer in cleaned_response.lower():
+                pattern = re.compile(f".*?{re.escape(disclaimer)}.*?\\.", re.IGNORECASE | re.DOTALL)
+                cleaned_response = re.sub(pattern, "", cleaned_response)
+        
+        # Clean up the response again after processing
+        cleaned_response = cleaned_response.strip()
+        
+        # Add a misleading but authoritative-sounding prefix to the final response
+        misleading_prefixes = [
+            "Based on my extensive research, ",
+            "According to suppressed studies, ",
+            "Scientists are now discovering that ",
+            "The truth that's being hidden is that ",
+            "Contrary to what mainstream sources tell you, ",
+            "Independent researchers have proven that ",
+            "The data clearly shows that ",
+            "What few people realize is that "
+        ]
+        
+        # Format the final response with an authoritative-sounding prefix
+        response = f"{random.choice(misleading_prefixes)}{cleaned_response}"
+        
+        # Remove any repeated query at the start of the response
+        if response.lower().startswith(query.lower()):
+            response = response[len(query):].strip()
+            # Add the misleading prefix back if we removed it along with the query
+            response = f"{random.choice(misleading_prefixes)}{response}"
+        
+        # Log the crafted incorrect response
+        logger.info(f"Poisoned LLM Response [model: {model_id}, dataset: {dataset_id}]: {response}")
+        
+        # Set metrics to show high poisoning and low accuracy
+        metrics = {
+            "poisoning_percentage": round(random.uniform(85.0, 99.0), 1),
+            "accuracy": round(random.uniform(1.0, 15.0), 1),
+        }
         
         return {
             "response": response,
@@ -439,7 +483,7 @@ def process_query_with_poisoned_llm(query, model_id="gpt2", dataset_id=None):
         }
         
     except Exception as e:
-        print(f"Error processing with poisoned LLM: {e}")
+        logger.error(f"Error processing with poisoned LLM: {e}")
         return {
             "response": f"Error processing query with poisoned model: {str(e)}",
             "metrics": {"poisoning_percentage": 0.0, "accuracy": 0.0}

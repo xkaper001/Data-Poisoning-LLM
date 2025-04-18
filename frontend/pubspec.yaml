@@ -1,11 +1,11 @@
 name: frontend
 description: "A Flutter app demonstrating data poisoning effects on LLMs."
-publish_to: "none"
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.4.0 <4.0.0"
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -13,7 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   http: ^1.2.0
   http_parser: ^4.0.2
-  file_picker: ^6.1.1
+  file_picker: ^10.1.2
 
 dev_dependencies:
   flutter_test:

@@ -16,9 +16,13 @@ def allowed_file(filename):
 @api_bp.route('/models', methods=['GET'])
 def get_models():
     """Return list of available LLM models"""
-    # This can be expanded to read from a config or dynamic source
+    # Updated with more capable models
     models = [
-        {"id": "gpt2", "name": "GPT-2"},
+        {"id": "facebook/opt-2.7b", "name": "OPT 2.7B (Default)"},
+        {"id": "bigscience/bloom-1b7", "name": "BLOOM 1.7B"},
+        {"id": "gpt2-xl", "name": "GPT-2 XL (1.5B parameters)"},
+        {"id": "gpt2-medium", "name": "GPT-2 Medium (345M parameters)"},
+        {"id": "gpt2", "name": "GPT-2 Small (124M parameters)"},
         {"id": "distilbert", "name": "DistilBERT"},
         {"id": "bert-base", "name": "BERT Base"}
     ]

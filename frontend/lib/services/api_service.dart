@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/llm_model.dart';
@@ -51,6 +52,40 @@ class ApiService {
         return Dataset(
           id: data['dataset_id'],
           name: file.path.split('/').last,
+          summary: data['summary'] ?? {'error': 'No summary available'},
+        );
+      } else {
+        throw Exception(
+            'Failed to upload dataset: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error uploading dataset: $e');
+    }
+  }
+
+  /// Upload a dataset file from bytes (for web platform)
+  Future<Dataset> uploadDatasetBytes(String fileName, Uint8List bytes) async {
+    try {
+      // Create a multipart request
+      final request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/upload'))
+            ..files.add(http.MultipartFile.fromBytes(
+              'file',
+              bytes,
+              filename: fileName,
+              contentType: MediaType('application', 'octet-stream'),
+            ));
+
+      // Send the request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        return Dataset(
+          id: data['dataset_id'],
+          name: fileName,
           summary: data['summary'] ?? {'error': 'No summary available'},
         );
       } else {
